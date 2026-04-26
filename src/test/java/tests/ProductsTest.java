@@ -4,7 +4,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class ProductsTest extends AuthBaseTest {
-
     // проверка страницы
     @Test
     public void shouldBeOnProductsPage() {
@@ -14,7 +13,6 @@ public class ProductsTest extends AuthBaseTest {
     // Проверка: карточка товара
     @Test
     public void shouldDisplayProductCardWithNameAndPrice() {
-
         productsPage.open();
 
         Assert.assertTrue(productsPage.isProductDisplayed("Sauce Labs Backpack"));

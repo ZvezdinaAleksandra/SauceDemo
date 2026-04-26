@@ -15,7 +15,6 @@ public class CheckoutOverviewTest extends AuthBaseTest {
     // Проверка: на странице Overview отображаются товары из корзины
     @Test
     public void checkOverviewPageElements() {
-
         goToOverview();
 
         Assert.assertTrue(checkoutOverviewPage.getItemsCount() > 0);
@@ -24,7 +23,6 @@ public class CheckoutOverviewTest extends AuthBaseTest {
     // Проверка: кнопка Cancel возвращает пользователя на страницу товаров
     @Test
     public void checkCancelReturnsToCart() {
-
         goToOverview();
         checkoutOverviewPage.clickCancel();
 
@@ -33,7 +31,6 @@ public class CheckoutOverviewTest extends AuthBaseTest {
     // Проверка: после нажатия Finish происходит переход на страницу завершения заказа
     @Test
     public void checkFinishOrder() {
-
         goToOverview();
         checkoutOverviewPage.clickFinish();
 
