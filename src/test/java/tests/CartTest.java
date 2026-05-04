@@ -4,15 +4,27 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
-public class CartTest extends AuthBaseTest {
-    // Проверка перехода на страницу корзины
-    @Test
+import java.util.Objects;
+
+public class CartTest extends BaseTest {
+    // Smoke: открытие корзины
+    @Test(
+            priority = 1,
+            groups = {"smoke", "regression"},
+            testName = "Open Cart Page",
+            description = "Проверка открытия страницы корзины и отображения заголовка 'Your Cart'"
+    )
     public void shouldBeOnCartPage () {
         cartPage.open();
         Assert.assertEquals(cartPage.getTitleYourCart(), "Your Cart");
     }
-    // Проверка, что товар отображается в корзине
-    @Test
+    // Основной флоу: добавили товар-проверили
+    @Test(
+            priority = 2,
+            groups = {"smoke", "regression"},
+            testName = "Add Product To Cart",
+            description = "Проверка добавления товара в корзину и корректности его отображения (название и цена)"
+    )
     public void shouldContainCorrectProductInCart() {
         SoftAssert softAssert = new SoftAssert();
 
@@ -30,8 +42,13 @@ public class CartTest extends AuthBaseTest {
         );
         softAssert.assertAll();
     }
-    // Проверка удаления товара через кнопку Remove
-    @Test
+    // Основной флоу: удаление
+    @Test(
+            priority = 3,
+            groups = {"regression"},
+            testName = "Remove Product From Cart",
+            description = "Проверка удаления товара из корзины по кнопке Remove"
+    )
     public void shouldRemoveProductFromCart() {
         productsPage.addProductToCart("Sauce Labs Backpack");
         productsPage.clickShoppingCart();
@@ -39,8 +56,13 @@ public class CartTest extends AuthBaseTest {
 
         Assert.assertFalse(cartPage.isProductInCart("Sauce Labs Backpack"));
     }
-    // Проверка, что корзина пустая после удаления товара
-    @Test
+    // Проверка состояния после удаления
+    @Test(
+            priority = 4,
+            groups = {"regression"},
+            testName = "Empty Cart After Removal",
+            description = "Проверка, что корзина становится пустой после удаления товара"
+    )
     public void shouldBeEmptyCartAfterRemovingProduct() {
         productsPage.addProductToCart("Sauce Labs Backpack");
         productsPage.clickShoppingCart();
@@ -48,8 +70,13 @@ public class CartTest extends AuthBaseTest {
 
         Assert.assertEquals(cartPage.getProductsCount(), 0);
     }
-    // Проверка добавления нескольких товаров
-    @Test
+    // Доп: несколько товаров
+    @Test(
+            priority = 5,
+            groups = {"regression"},
+            testName = "Add Multiple Products To Cart",
+            description = "Проверка добавления нескольких товаров в корзину и их одновременного отображения"
+    )
     public void shouldContainMultipleProductsInCart() {
         SoftAssert softAssert = new SoftAssert();
         productsPage.addProductToCart("Sauce Labs Backpack");
@@ -66,12 +93,18 @@ public class CartTest extends AuthBaseTest {
         );
         softAssert.assertAll();
     }
-    // Проверка кнопок корзины
-    @Test
+    // Кнопки
+    @Test(
+            priority = 6,
+            groups = {"regression"},
+            testName = "Cart Action Buttons Visibility",
+            description = "Проверка отображения кнопок Checkout и Continue Shopping в корзине"
+    )
     public void shouldDisplayActionButtonsInCart() {
         SoftAssert softAssert = new SoftAssert();
         productsPage.addProductToCart("Sauce Labs Backpack");
         productsPage.clickShoppingCart();
+
         softAssert.assertTrue(
                 cartPage.isCheckoutButtonDisplayed(),
                 "Кнопка Checkout не отображается"
@@ -82,8 +115,13 @@ public class CartTest extends AuthBaseTest {
         );
         softAssert.assertAll();
     }
-    // Проверка перехода на checkout страницу
-    @Test
+    // Переход в checkout
+    @Test(
+            priority = 7,
+            groups = {"smoke", "regression", "e2e"},
+            testName = "Navigate To Checkout",
+            description = "Проверка перехода на страницу оформления заказа (Checkout) из корзины"
+    )
     public void shouldNavigateToCheckoutPage() {
         productsPage.addProductToCart("Sauce Labs Backpack");
         productsPage.clickShoppingCart();
@@ -91,13 +129,18 @@ public class CartTest extends AuthBaseTest {
 
         Assert.assertTrue(driver.getCurrentUrl().contains("checkout"));
     }
-    // Проверка возврата на страницу товаров через Continue Shopping
-    @Test
+    // Возврат к товарам
+    @Test(
+            priority = 8,
+            groups = {"regression"},
+            testName = "Return To Products From Cart",
+            description = "Проверка возврата на страницу товаров при нажатии Continue Shopping"
+    )
     public void shouldReturnToProductsPageFromCart() {
         productsPage.addProductToCart("Sauce Labs Backpack");
         productsPage.clickShoppingCart();
         cartPage.clickContinueShopping();
 
-        Assert.assertTrue(driver.getCurrentUrl().contains("inventory"));
+        Assert.assertTrue(Objects.requireNonNull(driver.getCurrentUrl()).contains("inventory"));
     }
 }
