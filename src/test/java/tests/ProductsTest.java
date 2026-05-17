@@ -3,15 +3,35 @@ package tests;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class ProductsTest extends AuthBaseTest {
-    // проверка страницы
-    @Test
+public class ProductsTest extends BaseTest {
+    // Проверка страницы
+    @Test(
+            priority = 1,
+            groups = {"smoke", "regression"},
+            testName = "Products Page Is Opened",
+            description = "Проверка открытия страницы продуктов и отображения заголовка"
+    )
+    //public void shouldBeOnProductsPage() {
+    // productsPage.open();
+    // Assert.assertEquals(productsPage.getTitle(), "Products"); }
+
+    //Для проверки Retry
     public void shouldBeOnProductsPage() {
         productsPage.open();
+
+        if (Math.random() < 0.7) {
+            Assert.fail("Random fail to test retry");
+        }
+
         Assert.assertEquals(productsPage.getTitle(), "Products");
     }
     // Проверка: карточка товара
-    @Test
+    @Test(
+            priority = 2,
+            groups = {"regression"},
+            testName = "Product Card Display",
+            description = "Проверка отображения карточки товара с названием и ценой"
+    )
     public void shouldDisplayProductCardWithNameAndPrice() {
         productsPage.open();
 
@@ -22,7 +42,12 @@ public class ProductsTest extends AuthBaseTest {
         );
     }
     // Проверка: добавление товара
-    @Test
+    @Test(
+            priority = 3,
+            groups = {"smoke", "regression"},
+            testName = "Add Product To Cart",
+            description = "Проверка добавления товара в корзину и обновления badge"
+    )
     public void shouldAddProductToCart() {
         productsPage.open();
         productsPage.addProductToCart("Sauce Labs Backpack");
@@ -30,7 +55,12 @@ public class ProductsTest extends AuthBaseTest {
         Assert.assertEquals(productsPage.getCartBadgeText(), "1");
     }
     // Проверка: кнопка Remove
-    @Test
+    @Test(
+            priority = 4,
+            groups = {"regression"},
+            testName = "Remove Button Appears",
+            description = "Проверка смены кнопки Add to Cart на Remove после добавления товара"
+    )
     public void shouldChangeAddToCartButtonToRemove() {
         productsPage.open();
         productsPage.addProductToCart("Sauce Labs Backpack");
@@ -38,7 +68,12 @@ public class ProductsTest extends AuthBaseTest {
         Assert.assertTrue(productsPage.isRemoveButtonDisplayed("Sauce Labs Backpack"));
     }
     // Проверка: добавлено два товара
-    @Test
+    @Test(
+            priority = 5,
+            groups = {"regression"},
+            testName = "Cart Badge Increases",
+            description = "Проверка увеличения счетчика корзины при добавлении нескольких товаров"
+    )
     public void shouldIncreaseCartBadgeWhenAddingTwoProducts() {
         productsPage.open();
         productsPage.addProductToCart("Sauce Labs Backpack");
@@ -47,7 +82,12 @@ public class ProductsTest extends AuthBaseTest {
         Assert.assertEquals(productsPage.getCartBadgeText(), "2");
     }
     // Проверка: удаление товара
-    @Test
+    @Test(
+            priority = 6,
+            groups = {"regression"},
+            testName = "Cart Badge Decreases After Removal",
+            description = "Проверка обновления счетчика корзины после удаления товара"
+    )
     public void shouldDecreaseCartBadgeWhenRemovingProduct() {
         productsPage.open();
         productsPage.addProductToCart("Sauce Labs Backpack");
@@ -56,7 +96,12 @@ public class ProductsTest extends AuthBaseTest {
         Assert.assertTrue(productsPage.isCartBadgeEmpty());
     }
     // Проверка: переход в корзину
-    @Test
+    @Test(
+            priority = 7,
+            groups = {"smoke", "regression"},
+            testName = "Navigate To Cart",
+            description = "Проверка перехода на страницу корзины"
+    )
     public void shouldNavigateToCartPage() {
         productsPage.open();
         productsPage.clickShoppingCart();
@@ -64,7 +109,12 @@ public class ProductsTest extends AuthBaseTest {
         Assert.assertTrue(driver.getCurrentUrl().contains("cart"));
     }
     // Проверка: количество товаров
-    @Test
+    @Test(
+            priority = 8,
+            groups = {"regression"},
+            testName = "All Products Are Displayed",
+            description = "Проверка отображения всех товаров на странице продуктов"
+    )
     public void shouldDisplayAllProductsOnPage() {
         productsPage.open();
 

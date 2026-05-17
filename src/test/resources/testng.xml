@@ -1,0 +1,31 @@
+<suite name="Sauce Demo Cross Browser Suite" thread-count="2" parallel="tests">
+
+    <listeners>
+        <listener class-name="tests.RetryTransformer"/>
+    </listeners>
+
+    <test name="Chrome Tests">
+        <parameter name="browser" value="chrome"/>
+        <classes>
+            <class name="tests.LoginTest"/>
+            <class name="tests.ProductsTest"/>
+            <class name="tests.CartTest"/>
+            <class name="tests.CheckoutInformationTest"/>
+            <class name="tests.CheckoutOverviewTest"/>
+            <class name="tests.CheckoutCompleteTest"/>
+        </classes>
+    </test>
+
+    <test name="Edge Tests">
+        <parameter name="browser" value="edge"/>
+        <classes>
+            <class name="tests.LoginTest"/>
+            <class name="tests.ProductsTest"/>
+            <class name="tests.CartTest"/>
+            <class name="tests.CheckoutInformationTest"/>
+            <class name="tests.CheckoutOverviewTest"/>
+            <class name="tests.CheckoutCompleteTest"/>
+        </classes>
+    </test>
+
+</suite>

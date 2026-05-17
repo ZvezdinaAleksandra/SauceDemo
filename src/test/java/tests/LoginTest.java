@@ -1,36 +1,45 @@
 package tests;
 
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class LoginTest extends BaseTest{
+public class LoginTest extends BaseTest {
     // Проверка: успешный логин с валидными данными
-    @Test
+    @Test(
+            priority = 1,
+            groups = {"smoke", "regression"},
+            testName = "Successful Login",
+            description = "Проверка успешного входа в систему с валидными учетными данными"
+    )
     public void checkLoginWithPositiveCred() {
         loginPage.open();
         loginPage.login("standard_user","secret_sauce");
         Assert.assertEquals(productsPage.getTitle(), "Products");
     }
-    // Проверка: логин без пароля
-    @Test
-    public void checkLoginWithEmptyPassword() {
-        loginPage.open();
-        loginPage.login("standard_user","");
-        Assert.assertEquals(loginPage.getErrorMessage(), "Epic sadface: Password is required");
+    //NEGATIVE TESTS
+
+    @DataProvider(name = "negativeLoginData")
+    public Object[][] negativeLoginData() {
+        return new Object[][]{
+                {"standard_user", "", "Epic sadface: Password is required"},
+                {"", "secret_sauce", "Epic sadface: Username is required"},
+                {"test", "test", "Epic sadface: Username and password do not match any user in this service"}
+        };
     }
-    // Проверка: логин без username
-    @Test
-    public void checkLoginWithEmptyUser() {
+
+    @Test(
+            priority = 2,
+            groups = {"regression"},
+            testName = "Negative Login Scenarios",
+            description = "Проверка негативных сценариев логина с различными невалидными данными",
+            dataProvider = "negativeLoginData"
+    )
+    public void checkNegativeLogin(String username, String password, String expectedError) {
+
         loginPage.open();
-        loginPage.login("","secret_sauce");
-        Assert.assertEquals(loginPage.getErrorMessage(), "Epic sadface: Username is required");
-    }
-    // Проверка: логин с невалидными данными должен быть отклонён
-    @Test
-    public void checkLoginWithNegativeCred() {
-        loginPage.open();
-        loginPage.login("test","test");
-        Assert.assertEquals(loginPage.getErrorMessage(), "Epic sadface: Username and password do not match any " +
-                "user in this service");
+        loginPage.login(username, password);
+
+        Assert.assertEquals(loginPage.getErrorMessage(), expectedError);
     }
 }
