@@ -1,7 +1,8 @@
 <suite name="Sauce Demo Cross Browser Suite" thread-count="2" parallel="tests">
 
     <listeners>
-        <listener class-name="tests.RetryTransformer"/>
+        <listener class-name="utils.RetryTransformer"/>
+        <listener class-name="utils.TestListener"/>
     </listeners>
 
     <test name="Chrome Tests">
