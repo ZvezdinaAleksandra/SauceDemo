@@ -28,7 +28,7 @@ public class ProductsTest extends BaseTest {
 
         productsPage.open();
 
-        // контролируемый flaky сценарий (только demo retry)
+        // контролируемый flaky сценарий
         attempt++;
 
         if (attempt < 3) {
