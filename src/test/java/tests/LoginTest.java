@@ -21,8 +21,9 @@ public class LoginTest extends BaseTest {
     @Story("Позитивный сценарий логина")
     @Severity(SeverityLevel.CRITICAL)
     public void checkLoginWithPositiveCred() {
+
         loginPage.open();
-        loginPage.login("standard_user", "secret_sauce");
+        loginPage.login(user, password);
 
         Assert.assertEquals(productsPage.getTitle(), "Products");
     }

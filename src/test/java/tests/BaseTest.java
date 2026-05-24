@@ -9,12 +9,7 @@ import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
-import pages.CartPage;
-import pages.CheckoutCompletePage;
-import pages.CheckoutInformationPage;
-import pages.CheckoutOverviewPage;
-import pages.LoginPage;
-import pages.ProductsPage;
+import pages.*;
 import utils.TestListener;
 
 import java.time.Duration;
@@ -31,9 +26,16 @@ public class BaseTest {
     protected CheckoutOverviewPage checkoutOverviewPage;
     protected CheckoutCompletePage checkoutCompletePage;
 
+    protected String user = System.getProperty("user");
+    protected String password = System.getProperty("password");
+
     @BeforeMethod(alwaysRun = true, description = "Настройка браузера")
     @Description("Настройка браузера")
     public void setUp(ITestContext iTestContext) {
+
+        if (user == null || password == null) {
+            throw new RuntimeException("USER or PASSWORD is null. Check GitHub Secrets / env variables");
+        }
 
         EdgeOptions options = new EdgeOptions();
 
@@ -45,6 +47,7 @@ public class BaseTest {
         driver = new EdgeDriver(options);
 
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(60));
 
         // Page Objects
         loginPage = new LoginPage(driver);
@@ -56,9 +59,6 @@ public class BaseTest {
 
         iTestContext.setAttribute("driver", driver);
 
-        // LOGIN
-        loginPage.open();
-        loginPage.login("standard_user", "secret_sauce");
     }
 
     @AfterMethod(alwaysRun = true, description = "Закрытие браузера")
