@@ -5,6 +5,7 @@ import io.qameta.allure.testng.AllureTestNg;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
+import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -30,8 +31,8 @@ public class BaseTest {
     protected String user = System.getProperty("user", PropertyReader.getProperty("user"));
     protected String password = System.getProperty("password", PropertyReader.getProperty("password"));
 
-    @BeforeMethod(alwaysRun = true, description = "Настройка браузера")
-    @Description("Настройка браузера")
+    @BeforeMethod(alwaysRun = true, description = "Настройка браузера + авторизация")
+    @Description("Настройка браузера + авторизация")
     public void setUp(ITestContext iTestContext) {
 
         if (user == null || password == null) {
@@ -39,7 +40,6 @@ public class BaseTest {
         }
 
         EdgeOptions options = new EdgeOptions();
-
         options.addArguments("--headless=new");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
@@ -58,8 +58,18 @@ public class BaseTest {
         checkoutOverviewPage = new CheckoutOverviewPage(driver);
         checkoutCompletePage = new CheckoutCompletePage(driver);
 
-        iTestContext.setAttribute("driver", driver);
+        driver.get("https://www.saucedemo.com/");
 
+        // 🔥 ГЛАВНОЕ: единый логин для всех тестов
+        loginPage.login(user, password);
+
+        // 🔥 проверка что логин реально прошёл
+        Assert.assertTrue(
+                productsPage.getTitle().equals("Products"),
+                "Login failed or Products page not loaded"
+        );
+
+        iTestContext.setAttribute("driver", driver);
     }
 
     @AfterMethod(alwaysRun = true, description = "Закрытие браузера")
