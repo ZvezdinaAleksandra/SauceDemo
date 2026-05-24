@@ -10,6 +10,9 @@ import utils.Retry;
 @Owner("Zvezdina Aleksandra")
 public class ProductsTest extends BaseTest {
 
+    // контролируемый flaky счетчик
+    private static int attempt = 0;
+
     // Проверка страницы (flaky + retry)
     @Test(
             priority = 1,
@@ -25,8 +28,10 @@ public class ProductsTest extends BaseTest {
 
         productsPage.open();
 
-        // симуляция flaky поведения (только для demo retry)
-        if (Math.random() < 0.5) {
+        // контролируемый flaky сценарий (только demo retry)
+        attempt++;
+
+        if (attempt < 3) {
             throw new RuntimeException("Simulated flaky failure for retry demo");
         }
 
