@@ -10,10 +10,9 @@ import utils.Retry;
 @Owner("Zvezdina Aleksandra")
 public class ProductsTest extends BaseTest {
 
-    // контролируемый flaky счетчик
-    private static int attempt = 0;
+    // безопасный flaky счетчик (на поток)
+    private static final ThreadLocal<Integer> attempt = ThreadLocal.withInitial(() -> 0);
 
-    // Проверка страницы (flaky + retry)
     @Test(
             priority = 1,
             groups = {"smoke", "regression"},
@@ -28,17 +27,16 @@ public class ProductsTest extends BaseTest {
 
         productsPage.open();
 
-        // контролируемый flaky сценарий
-        attempt++;
+        int currentAttempt = attempt.get();
+        attempt.set(currentAttempt + 1);
 
-        if (attempt < 3) {
+        if (currentAttempt < 2) {
             throw new RuntimeException("Simulated flaky failure for retry demo");
         }
 
         Assert.assertEquals(productsPage.getTitle(), "Products");
     }
 
-    // Проверка: карточка товара
     @Test(
             priority = 2,
             groups = {"regression"},
@@ -56,7 +54,6 @@ public class ProductsTest extends BaseTest {
         Assert.assertEquals(productsPage.getProductPrice("Sauce Labs Backpack"), "$29.99");
     }
 
-    // Добавление товара
     @Test(
             priority = 3,
             groups = {"smoke", "regression"},
@@ -74,7 +71,6 @@ public class ProductsTest extends BaseTest {
         Assert.assertEquals(productsPage.getCartBadgeText(), "1");
     }
 
-    // Кнопка Remove
     @Test(
             priority = 4,
             groups = {"regression"},
@@ -92,7 +88,6 @@ public class ProductsTest extends BaseTest {
         Assert.assertTrue(productsPage.isRemoveButtonDisplayed("Sauce Labs Backpack"));
     }
 
-    // Добавление 2 товаров
     @Test(
             priority = 5,
             groups = {"regression"},
@@ -111,7 +106,6 @@ public class ProductsTest extends BaseTest {
         Assert.assertEquals(productsPage.getCartBadgeText(), "2");
     }
 
-    // Удаление товара
     @Test(
             priority = 6,
             groups = {"regression"},
@@ -130,7 +124,6 @@ public class ProductsTest extends BaseTest {
         Assert.assertTrue(productsPage.isCartBadgeEmpty());
     }
 
-    // Переход в корзину
     @Test(
             priority = 7,
             groups = {"smoke", "regression"},
@@ -148,7 +141,6 @@ public class ProductsTest extends BaseTest {
         Assert.assertTrue(driver.getCurrentUrl().contains("cart"));
     }
 
-    // Проверка всех товаров
     @Test(
             priority = 8,
             groups = {"regression"},
