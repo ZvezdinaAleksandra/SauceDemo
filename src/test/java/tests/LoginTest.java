@@ -1,10 +1,15 @@
 package tests;
 
+import io.qameta.allure.*;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+@Epic("Authentication Tests")
+@Feature("Login Functionality")
+@Owner("Zvezdina Aleksandra")
 public class LoginTest extends BaseTest {
+
     // Проверка: успешный логин с валидными данными
     @Test(
             priority = 1,
@@ -12,13 +17,17 @@ public class LoginTest extends BaseTest {
             testName = "Successful Login",
             description = "Проверка успешного входа в систему с валидными учетными данными"
     )
+    @Description("Проверка успешной авторизации пользователя")
+    @Story("Позитивный сценарий логина")
+    @Severity(SeverityLevel.CRITICAL)
     public void checkLoginWithPositiveCred() {
         loginPage.open();
-        loginPage.login("standard_user","secret_sauce");
+        loginPage.login("standard_user", "secret_sauce");
+
         Assert.assertEquals(productsPage.getTitle(), "Products");
     }
-    //NEGATIVE TESTS
 
+    // NEGATIVE TESTS
     @DataProvider(name = "negativeLoginData")
     public Object[][] negativeLoginData() {
         return new Object[][]{
@@ -32,9 +41,12 @@ public class LoginTest extends BaseTest {
             priority = 2,
             groups = {"regression"},
             testName = "Negative Login Scenarios",
-            description = "Проверка негативных сценариев логина с различными невалидными данными",
+            description = "Проверка негативных сценариев логина с невалидными данными",
             dataProvider = "negativeLoginData"
     )
+    @Description("Проверка ошибок авторизации при некорректных данных")
+    @Story("Негативные сценарии логина")
+    @Severity(SeverityLevel.NORMAL)
     public void checkNegativeLogin(String username, String password, String expectedError) {
 
         loginPage.open();
