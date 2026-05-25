@@ -1,70 +1,68 @@
 package tests;
 
 import io.qameta.allure.*;
+import lombok.extern.log4j.Log4j2;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+@Log4j2
 @Epic("E2E Tests")
 @Feature("Checkout Overview Functionality")
 @Owner("Zvezdina Aleksandra")
 public class CheckoutOverviewTest extends BaseTest {
-
     private void goToOverview() {
+        log.info("[FLOW] Start navigation to Overview page");
         productsPage.addProductToCart("Sauce Labs Backpack");
+        log.info("Product added to cart");
         productsPage.clickShoppingCart();
+        log.info("Cart opened");
         cartPage.clickCheckout();
+        log.info("Checkout clicked");
         checkoutInformationPage.fillForm("Alex", "Ivanov", "12345");
+        log.info("Checkout information filled");
         checkoutInformationPage.clickContinue();
+        log.info("Moved to Overview page");
+        log.info("[FLOW] Overview page reached");
     }
-
-    // Проверка: на странице Overview отображаются товары из корзины
     @Test(
             priority = 1,
-            groups = {"smoke", "regression", "e2e"},
-            testName = "Overview Items And User Info Display",
-            description = "Проверка отображения товаров и информации пользователя на странице Overview"
+            groups = {"smoke", "regression", "e2e"}
     )
-    @Description("Проверка корректного отображения товаров и user info на Overview странице")
-    @Story("Отображение данных заказа на Overview")
-    @Severity(SeverityLevel.CRITICAL)
     public void checkOverviewPageElements() {
+        log.info("[TEST] checkOverviewPageElements START");
         goToOverview();
-
-        Assert.assertTrue(checkoutOverviewPage.getItemsCount() > 0);
-        Assert.assertTrue(checkoutOverviewPage.isUserInfoDisplayed());
+        int itemsCount = checkoutOverviewPage.getItemsCount();
+        boolean userInfoDisplayed = checkoutOverviewPage.isUserInfoDisplayed();
+        log.info("Items count = {}", itemsCount);
+        log.info("User info displayed = {}", userInfoDisplayed);
+        Assert.assertTrue(itemsCount > 0, "No items in overview");
+        Assert.assertTrue(userInfoDisplayed, "User info not displayed");
+        log.info("[TEST] checkOverviewPageElements END");
     }
-
-    // Проверка: кнопка Cancel возвращает пользователя на страницу товаров
     @Test(
             priority = 2,
-            groups = {"regression"},
-            testName = "Cancel From Overview Returns To Products",
-            description = "Проверка возврата на страницу товаров при нажатии Cancel"
+            groups = {"regression"}
     )
-    @Description("Проверка кнопки Cancel на странице Overview")
-    @Story("Отмена оформления заказа на Overview")
-    @Severity(SeverityLevel.NORMAL)
     public void checkCancelReturnsToCart() {
+        log.info("[TEST] checkCancelReturnsToCart START");
         goToOverview();
         checkoutOverviewPage.clickCancel();
-
-        Assert.assertTrue(driver.getCurrentUrl().contains("inventory"));
+        String url = driver.getCurrentUrl();
+        log.info("URL after cancel = {}", url);
+        Assert.assertTrue(url.contains("inventory"));
+        log.info("[TEST] checkCancelReturnsToCart END");
     }
-
-    // Проверка: завершение заказа
     @Test(
             priority = 3,
-            groups = {"smoke", "regression", "e2e"},
-            testName = "Finish Order Navigation",
-            description = "Проверка перехода на страницу завершения заказа после нажатия Finish"
+            groups = {"smoke", "regression", "e2e"}
     )
-    @Description("Проверка завершения заказа через кнопку Finish")
-    @Story("Финализация заказа")
-    @Severity(SeverityLevel.CRITICAL)
     public void checkFinishOrder() {
+        log.info("[TEST] checkFinishOrder START");
         goToOverview();
         checkoutOverviewPage.clickFinish();
-
-        Assert.assertTrue(driver.getCurrentUrl().contains("checkout-complete"));
+        String url = driver.getCurrentUrl();
+        log.info("URL after finish = {}", url);
+        Assert.assertTrue(url.contains("checkout-complete"));
+        log.info("[TEST] checkFinishOrder END");
     }
 }

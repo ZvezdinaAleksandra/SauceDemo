@@ -1,34 +1,31 @@
 package tests;
 
 import io.qameta.allure.*;
+import lombok.extern.log4j.Log4j2;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+@Log4j2
 @Epic("Authentication Tests")
 @Feature("Login Functionality")
 @Owner("Zvezdina Aleksandra")
 public class LoginTest extends BaseTest {
-
-    // Проверка: успешный логин с валидными данными
     @Test(
             priority = 1,
-            groups = {"smoke", "regression"},
-            testName = "Successful Login",
-            description = "Проверка успешного входа в систему с валидными учетными данными"
+            groups = {"smoke", "regression"}
     )
-    @Description("Проверка успешной авторизации пользователя")
-    @Story("Позитивный сценарий логина")
-    @Severity(SeverityLevel.CRITICAL)
     public void checkLoginWithPositiveCred() {
-
+        log.info("[TEST] Positive login started");
         loginPage.open();
+        log.info("Login page opened");
         loginPage.login(user, password);
-
-        Assert.assertEquals(productsPage.getTitle(), "Products");
+        log.info("Login performed with valid credentials");
+        String title = productsPage.getTitle();
+        log.info("Products page title = {}", title);
+        Assert.assertEquals(title, "Products");
+        log.info("[TEST] Positive login finished");
     }
-
-    // NEGATIVE TESTS
     @DataProvider(name = "negativeLoginData")
     public Object[][] negativeLoginData() {
         return new Object[][]{
@@ -37,22 +34,21 @@ public class LoginTest extends BaseTest {
                 {"test", "test", "Epic sadface: Username and password do not match any user in this service"}
         };
     }
-
     @Test(
             priority = 2,
             groups = {"regression"},
-            testName = "Negative Login Scenarios",
-            description = "Проверка негативных сценариев логина с невалидными данными",
             dataProvider = "negativeLoginData"
     )
-    @Description("Проверка ошибок авторизации при некорректных данных")
-    @Story("Негативные сценарии логина")
-    @Severity(SeverityLevel.NORMAL)
     public void checkNegativeLogin(String username, String password, String expectedError) {
-
+        log.info("[TEST] Negative login started | user={}, pass={}", username, password);
         loginPage.open();
+        log.info("Login page opened");
         loginPage.login(username, password);
-
-        Assert.assertEquals(loginPage.getErrorMessage(), expectedError);
+        log.info("Login attempt done | user={}", username);
+        String actualError = loginPage.getErrorMessage();
+        log.info("Expected error = {}", expectedError);
+        log.info("Actual error = {}", actualError);
+        Assert.assertEquals(actualError, expectedError);
+        log.info("[TEST] Negative login finished | user={}", username);
     }
 }

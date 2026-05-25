@@ -2,6 +2,7 @@ package tests;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.testng.AllureTestNg;
+import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
@@ -16,6 +17,7 @@ import utils.TestListener;
 
 import java.time.Duration;
 
+@Log4j2
 @Listeners({AllureTestNg.class, TestListener.class})
 public class BaseTest {
 
@@ -34,6 +36,8 @@ public class BaseTest {
     @BeforeMethod(alwaysRun = true, description = "Настройка браузера + авторизация")
     @Description("Настройка браузера + авторизация")
     public void setUp(ITestContext iTestContext) {
+
+        log.info("=== START TEST SETUP ===");
 
         if (user == null || password == null) {
             throw new RuntimeException("USER or PASSWORD is null. Check GitHub Secrets / env variables");
@@ -58,25 +62,34 @@ public class BaseTest {
         checkoutOverviewPage = new CheckoutOverviewPage(driver);
         checkoutCompletePage = new CheckoutCompletePage(driver);
 
+        iTestContext.setAttribute("driver", driver);
+
+        log.info("Opening application");
+
         driver.get("https://www.saucedemo.com/");
 
-        // 🔥 ГЛАВНОЕ: единый логин для всех тестов
+        log.info("Performing login with user: {}", user);
+
         loginPage.login(user, password);
 
-        // 🔥 проверка что логин реально прошёл
         Assert.assertTrue(
                 productsPage.getTitle().equals("Products"),
                 "Login failed or Products page not loaded"
         );
 
-        iTestContext.setAttribute("driver", driver);
+        log.info("Login successful, setup completed");
     }
 
     @AfterMethod(alwaysRun = true, description = "Закрытие браузера")
     @Description("Закрытие браузера")
     public void tearDown() {
+
+        log.info("Closing browser");
+
         if (driver != null) {
             driver.quit();
         }
+
+        log.info("Browser closed");
     }
 }

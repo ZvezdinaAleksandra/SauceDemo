@@ -6,7 +6,6 @@ import org.testng.annotations.ITestAnnotation;
 import java.lang.reflect.Method;
 
 public class RetryTransformer implements IAnnotationTransformer {
-
     @Override
     public void transform(ITestAnnotation annotation,
                           Class testClass,
