@@ -1,12 +1,14 @@
 package tests;
 
 import io.qameta.allure.*;
+import lombok.extern.log4j.Log4j2;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
 import java.util.Objects;
 
+@Log4j2
 @Epic("E2E Tests")
 @Feature("Cart Functionality")
 @Owner("Zvezdina Aleksandra")
@@ -18,15 +20,13 @@ public class CartTest extends BaseTest {
             testName = "Open Cart Page",
             description = "Проверка открытия страницы корзины и отображения заголовка 'Your Cart'"
     )
-    @Description("Проверка открытия страницы корзины и отображения заголовка 'Your Cart'")
-    @Story("Открытие корзины")
-    @Severity(SeverityLevel.CRITICAL)
-    @Link("https://www.saucedemo.com/")
-    @TmsLink("ITM-5")
-    @Issue("ITM-5")
     public void shouldBeOnCartPage() {
+        log.info("[TEST] Open Cart Page started");
         cartPage.open();
-        Assert.assertEquals(cartPage.getTitleYourCart(), "Your Cart");
+        String actualTitle = cartPage.getTitleYourCart();
+        log.info("Cart title = {}", actualTitle);
+        Assert.assertEquals(actualTitle, "Your Cart");
+        log.info("[TEST] Open Cart Page finished successfully");
     }
 
     @Test(
@@ -35,153 +35,93 @@ public class CartTest extends BaseTest {
             testName = "Add Product To Cart",
             description = "Проверка добавления товара в корзину и корректности его отображения"
     )
-    @Description("Проверка добавления товара и его данных в корзине")
-    @Story("Добавление товара в корзину")
-    @Severity(SeverityLevel.CRITICAL)
     public void shouldContainCorrectProductInCart() {
+        log.info("[TEST] Add Product To Cart started");
         SoftAssert softAssert = new SoftAssert();
-
         productsPage.addProductToCart("Sauce Labs Backpack");
         productsPage.clickShoppingCart();
-
-        softAssert.assertTrue(
-                cartPage.isProductInCart("Sauce Labs Backpack"),
-                "Товар не отображается в корзине"
-        );
-
-        softAssert.assertEquals(
-                cartPage.getItemPrices().get(0),
-                "$29.99",
-                "Цена товара в корзине неверная"
-        );
-
+        boolean isInCart = cartPage.isProductInCart("Sauce Labs Backpack");
+        String price = cartPage.getItemPrices().get(0);
+        log.info("Product in cart = {}, price = {}", isInCart, price);
+        softAssert.assertTrue(isInCart, "Товар не отображается в корзине");
+        softAssert.assertEquals(price, "$29.99", "Цена товара в корзине неверная");
         softAssert.assertAll();
+        log.info("[TEST] Add Product To Cart finished");
     }
 
-    @Test(
-            priority = 3,
-            groups = {"regression"},
-            testName = "Remove Product From Cart",
-            description = "Проверка удаления товара из корзины"
-    )
-    @Description("Удаление товара через кнопку Remove")
-    @Story("Удаление товара")
-    @Severity(SeverityLevel.NORMAL)
+    @Test(priority = 3)
     public void shouldRemoveProductFromCart() {
+        log.info("[TEST] Remove Product From Cart started");
         productsPage.addProductToCart("Sauce Labs Backpack");
         productsPage.clickShoppingCart();
         cartPage.clickRemove("Sauce Labs Backpack");
-
-        Assert.assertFalse(cartPage.isProductInCart("Sauce Labs Backpack"));
+        boolean isInCart = cartPage.isProductInCart("Sauce Labs Backpack");
+        log.info("Product still in cart = {}", isInCart);
+        Assert.assertFalse(isInCart);
+        log.info("[TEST] Remove Product From Cart finished");
     }
 
-    @Test(
-            priority = 4,
-            groups = {"regression"},
-            testName = "Empty Cart After Removal",
-            description = "Проверка, что корзина пустая после удаления товара"
-    )
-    @Description("Корзина становится пустой после удаления товара")
-    @Story("Очистка корзины")
-    @Severity(SeverityLevel.NORMAL)
+    @Test(priority = 4)
     public void shouldBeEmptyCartAfterRemovingProduct() {
+        log.info("[TEST] Empty Cart After Removal started");
         productsPage.addProductToCart("Sauce Labs Backpack");
         productsPage.clickShoppingCart();
         cartPage.clickRemove("Sauce Labs Backpack");
-
-        Assert.assertEquals(cartPage.getProductsCount(), 0);
+        int count = cartPage.getProductsCount();
+        log.info("Products count = {}", count);
+        Assert.assertEquals(count, 0);
+        log.info("[TEST] Empty Cart After Removal finished");
     }
 
-    @Test(
-            priority = 5,
-            groups = {"regression"},
-            testName = "Add Multiple Products To Cart",
-            description = "Проверка добавления нескольких товаров в корзину"
-    )
-    @Description("Добавление нескольких товаров и проверка их отображения")
-    @Story("Множественное добавление товаров")
-    @Severity(SeverityLevel.NORMAL)
+    @Test(priority = 5)
     public void shouldContainMultipleProductsInCart() {
+        log.info("[TEST] Multiple Products In Cart started");
         SoftAssert softAssert = new SoftAssert();
-
         productsPage.addProductToCart("Sauce Labs Backpack");
         productsPage.addProductToCart("Sauce Labs Bike Light");
         productsPage.clickShoppingCart();
-
-        softAssert.assertTrue(
-                cartPage.isProductInCart("Sauce Labs Backpack"),
-                "Backpack отсутствует в корзине"
-        );
-
-        softAssert.assertTrue(
-                cartPage.isProductInCart("Sauce Labs Bike Light"),
-                "Bike Light отсутствует в корзине"
-        );
-
+        boolean p1 = cartPage.isProductInCart("Sauce Labs Backpack");
+        boolean p2 = cartPage.isProductInCart("Sauce Labs Bike Light");
+        log.info("Backpack in cart = {}, Bike Light in cart = {}", p1, p2);
+        softAssert.assertTrue(p1);
+        softAssert.assertTrue(p2);
         softAssert.assertAll();
+        log.info("[TEST] Multiple Products In Cart finished");
     }
-
-    @Test(
-            priority = 6,
-            groups = {"regression"},
-            testName = "Cart Action Buttons Visibility",
-            description = "Проверка отображения кнопок Checkout и Continue Shopping"
-    )
-    @Description("Проверка кнопок управления корзиной")
-    @Story("UI элементов корзины")
-    @Severity(SeverityLevel.MINOR)
+    @Test(priority = 6)
     public void shouldDisplayActionButtonsInCart() {
+        log.info("[TEST] Action Buttons Visibility started");
         SoftAssert softAssert = new SoftAssert();
-
         productsPage.addProductToCart("Sauce Labs Backpack");
         productsPage.clickShoppingCart();
-
-        softAssert.assertTrue(
-                cartPage.isCheckoutButtonDisplayed(),
-                "Кнопка Checkout не отображается"
-        );
-
-        softAssert.assertTrue(
-                cartPage.isContinueShoppingButtonDisplayed(),
-                "Кнопка Continue Shopping не отображается"
-        );
-
+        boolean checkoutVisible = cartPage.isCheckoutButtonDisplayed();
+        boolean continueVisible = cartPage.isContinueShoppingButtonDisplayed();
+        log.info("Checkout button = {}, Continue button = {}", checkoutVisible, continueVisible);
+        softAssert.assertTrue(checkoutVisible);
+        softAssert.assertTrue(continueVisible);
         softAssert.assertAll();
+        log.info("[TEST] Action Buttons Visibility finished");
     }
-
-    @Test(
-            priority = 7,
-            groups = {"smoke", "regression", "e2e"},
-            testName = "Navigate To Checkout",
-            description = "Проверка перехода на Checkout страницу"
-    )
-    @Description("Переход из корзины в оформление заказа")
-    @Story("Checkout переход")
-    @Severity(SeverityLevel.CRITICAL)
+    @Test(priority = 7)
     public void shouldNavigateToCheckoutPage() {
+        log.info("[TEST] Navigate To Checkout started");
         productsPage.addProductToCart("Sauce Labs Backpack");
         productsPage.clickShoppingCart();
         cartPage.clickCheckout();
-
-        Assert.assertTrue(driver.getCurrentUrl().contains("checkout"));
+        String url = driver.getCurrentUrl();
+        log.info("Current URL = {}", url);
+        Assert.assertTrue(url.contains("checkout"));
+        log.info("[TEST] Navigate To Checkout finished");
     }
-
-    @Test(
-            priority = 8,
-            groups = {"regression"},
-            testName = "Return To Products From Cart",
-            description = "Проверка возврата на страницу товаров"
-    )
-    @Description("Переход назад к товарам через Continue Shopping")
-    @Story("Навигация назад")
-    @Severity(SeverityLevel.NORMAL)
+    @Test(priority = 8)
     public void shouldReturnToProductsPageFromCart() {
+        log.info("[TEST] Return To Products started");
         productsPage.addProductToCart("Sauce Labs Backpack");
         productsPage.clickShoppingCart();
         cartPage.clickContinueShopping();
-
-        Assert.assertTrue(
-                Objects.requireNonNull(driver.getCurrentUrl()).contains("inventory")
-        );
+        String url = driver.getCurrentUrl();
+        log.info("Current URL = {}", url);
+        Assert.assertTrue(url.contains("inventory"));
+        log.info("[TEST] Return To Products finished");
     }
 }

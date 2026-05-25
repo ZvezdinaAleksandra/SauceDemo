@@ -1,86 +1,82 @@
 package tests;
 
 import io.qameta.allure.*;
+import lombok.extern.log4j.Log4j2;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
+@Log4j2
 @Epic("E2E Tests")
 @Feature("Checkout Complete Functionality")
 @Owner("Zvezdina Aleksandra")
 public class CheckoutCompleteTest extends BaseTest {
-
     private void goToCompletePage() {
+        log.info("[FLOW] Start checkout flow");
         productsPage.addProductToCart("Sauce Labs Backpack");
+        log.info("Product added to cart");
         productsPage.clickShoppingCart();
+        log.info("Opened cart page");
         cartPage.clickCheckout();
+        log.info("Clicked Checkout");
         checkoutInformationPage.fillForm("Alex", "Ivanov", "12345");
+        log.info("Checkout form filled");
         checkoutInformationPage.clickContinue();
+        log.info("Clicked Continue");
         checkoutOverviewPage.clickFinish();
+        log.info("Clicked Finish - order created");
+        log.info("[FLOW] Checkout flow completed");
     }
-
     @Test(
             priority = 1,
             groups = {"smoke", "regression", "e2e"},
-            testName = "Success Message Displayed",
-            description = "Проверка успешного оформления заказа и отображения сообщения"
+            testName = "Success Message Displayed"
     )
-    @Description("Проверка финального экрана успешного заказа")
-    @Story("Отображение success message")
-    @Severity(SeverityLevel.CRITICAL)
     public void checkSuccessMessageDisplayed() {
+        log.info("[TEST START] checkSuccessMessageDisplayed");
         goToCompletePage();
-
         SoftAssert softAssert = new SoftAssert();
-
+        boolean isDisplayed = checkoutCompletePage.isSuccessMessageDisplayed();
+        String message = checkoutCompletePage.getSuccessMessageText();
+        log.info("Success message displayed = {}", isDisplayed);
+        log.info("Success message text = {}", message);
         softAssert.assertTrue(
-                checkoutCompletePage.isSuccessMessageDisplayed(),
+                isDisplayed,
                 "Success message is not displayed"
         );
-
         softAssert.assertEquals(
-                checkoutCompletePage.getSuccessMessageText(),
+                message,
                 "Thank you for your order!",
                 "Success message text is incorrect"
         );
-
         softAssert.assertAll();
+        log.info("[TEST END] checkSuccessMessageDisplayed");
     }
-
     @Test(
             priority = 2,
             groups = {"regression", "e2e"},
-            testName = "Order Completion Text",
-            description = "Проверка текста завершения заказа"
+            testName = "Order Completion Text"
     )
-    @Description("Проверка текста подтверждения после оформления заказа")
-    @Story("Текст завершения заказа")
-    @Severity(SeverityLevel.NORMAL)
     public void checkCompleteOrderText() {
+        log.info("[TEST START] checkCompleteOrderText");
         goToCompletePage();
-
-        Assert.assertTrue(
-                checkoutCompletePage.getCompleteText()
-                        .contains("Your order has been dispatched")
-        );
+        String text = checkoutCompletePage.getCompleteText();
+        log.info("Complete text = {}", text);
+        Assert.assertTrue(text.contains("Your order has been dispatched"));
+        log.info("[TEST END] checkCompleteOrderText");
     }
-
     @Test(
             priority = 3,
             groups = {"smoke", "regression", "e2e"},
-            testName = "Back Home Navigation",
-            description = "Проверка возврата на страницу товаров после завершения заказа"
+            testName = "Back Home Navigation"
     )
-    @Description("Проверка кнопки Back Home и редиректа на каталог")
-    @Story("Навигация после завершения заказа")
-    @Severity(SeverityLevel.CRITICAL)
     public void checkBackHomeReturnsToProducts() {
+        log.info("[TEST START] checkBackHomeReturnsToProducts");
         goToCompletePage();
-
         checkoutCompletePage.clickBackHome();
-
-        Assert.assertTrue(
-                driver.getCurrentUrl().contains("inventory.html")
-        );
+        String url = driver.getCurrentUrl();
+        log.info("Current URL after Back Home = {}", url);
+        Assert.assertTrue(url.contains("inventory.html"));
+        log.info("[TEST END] checkBackHomeReturnsToProducts");
     }
 }

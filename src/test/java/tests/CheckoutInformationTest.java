@@ -1,77 +1,64 @@
 package tests;
 
 import io.qameta.allure.*;
+import lombok.extern.log4j.Log4j2;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+@Log4j2
 @Epic("E2E Tests")
 @Feature("Checkout Information Functionality")
 @Owner("Zvezdina Aleksandra")
 public class CheckoutInformationTest extends BaseTest {
-
-    // Проверка: успешное заполнение формы
     @Test(
             priority = 1,
-            groups = {"smoke", "regression", "e2e"},
-            testName = "Successful Checkout Info Fill",
-            description = "Проверка успешного заполнения формы checkout information и перехода на следующий шаг"
+            groups = {"smoke", "regression", "e2e"}
     )
-    @Description("Проверка корректного заполнения формы и перехода на следующий шаг checkout")
-    @Story("Успешное заполнение checkout формы")
-    @Severity(SeverityLevel.CRITICAL)
     public void successCheckoutInformationFill() {
-        loginPage.open();
-        loginPage.login("standard_user", "secret_sauce");
+        log.info("[TEST] successCheckoutInformationFill START");
         productsPage.addProductToCart("Sauce Labs Backpack");
         productsPage.openCart();
         cartPage.clickCheckout();
         checkoutInformationPage.fillForm("Alex", "Ivanov", "12345");
         checkoutInformationPage.clickContinue();
-
-        Assert.assertTrue(driver.getCurrentUrl().contains("checkout-step-two"));
+        String url = driver.getCurrentUrl();
+        log.info("Current URL after continue = {}", url);
+        Assert.assertTrue(url.contains("checkout-step-two"));
+        log.info("[TEST] successCheckoutInformationFill END");
     }
-
-    // Проверка: ошибка, если поля не заполнены
     @Test(
             priority = 2,
-            groups = {"regression"},
-            testName = "Checkout Info Empty Fields Validation",
-            description = "Проверка отображения ошибки при незаполненных полях формы checkout information"
+            groups = {"regression"}
     )
-    @Description("Валидация обязательных полей checkout формы")
-    @Story("Ошибка при пустых полях формы")
-    @Severity(SeverityLevel.NORMAL)
     public void checkoutInformationEmptyFieldsError() {
-        loginPage.open();
-        loginPage.login("standard_user", "secret_sauce");
+        log.info("[TEST] checkoutInformationEmptyFieldsError START");
         productsPage.addProductToCart("Sauce Labs Backpack");
         productsPage.openCart();
         cartPage.clickCheckout();
         checkoutInformationPage.fillForm("", "", "");
         checkoutInformationPage.clickContinue();
-
-        Assert.assertTrue(checkoutInformationPage.isErrorDisplayed());
-        Assert.assertTrue(checkoutInformationPage.getErrorMessage().contains("Error"));
+        boolean errorDisplayed = checkoutInformationPage.isErrorDisplayed();
+        String errorMessage = checkoutInformationPage.getErrorMessage();
+        log.info("Error displayed = {}", errorDisplayed);
+        log.info("Error message = {}", errorMessage);
+        Assert.assertTrue(errorDisplayed);
+        Assert.assertTrue(errorMessage.contains("Error"));
+        log.info("[TEST] checkoutInformationEmptyFieldsError END");
     }
 
-    // Проверка: кнопка Cancel возвращает в корзину
     @Test(
             priority = 3,
-            groups = {"smoke", "regression"},
-            testName = "Cancel Checkout Info Returns To Cart",
-            description = "Проверка возврата в корзину при нажатии кнопки Cancel"
+            groups = {"smoke", "regression"}
     )
-    @Description("Проверка кнопки Cancel на checkout information странице")
-    @Story("Отмена оформления заказа")
-    @Severity(SeverityLevel.MINOR)
     public void checkoutInformationCancelReturnsToCart() {
-        loginPage.open();
-        loginPage.login("standard_user", "secret_sauce");
+        log.info("[TEST] checkoutInformationCancelReturnsToCart START");
         productsPage.addProductToCart("Sauce Labs Backpack");
         productsPage.openCart();
         cartPage.clickCheckout();
         checkoutInformationPage.clickCancel();
-
-        Assert.assertTrue(driver.getCurrentUrl().contains("cart.html"));
+        String url = driver.getCurrentUrl();
+        log.info("Current URL after cancel = {}", url);
+        Assert.assertTrue(url.contains("cart.html"));
+        log.info("[TEST] checkoutInformationCancelReturnsToCart END");
     }
 }
