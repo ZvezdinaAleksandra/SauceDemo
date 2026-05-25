@@ -19,7 +19,7 @@ public class LoginTest extends BaseTest {
         log.info("[TEST] Positive login started");
         loginPage.open();
         log.info("Login page opened");
-        loginPage.login("standard_user", "secret_sauce");
+        loginPage.login(user, password);
         log.info("Login performed with valid credentials");
         String title = productsPage.getTitle();
         log.info("Products page title = {}", title);
